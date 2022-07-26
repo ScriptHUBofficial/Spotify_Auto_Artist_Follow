@@ -1,0 +1,163 @@
+[SETTINGS]
+{
+  "Name": "Spotify Artist Takipçi",
+  "SuggestedBots": 50,
+  "MaxCPM": 0,
+  "LastModified": "2022-07-01T17:51:50.2017264+03:00",
+  "AdditionalInfo": "Bu Config Artist Hesaplara Takipçi Basmak İçin Yapılmıştır.",
+  "Author": "ScriptHub",
+  "Version": "1.4.4 [Anomaly]",
+  "IgnoreResponseErrors": false,
+  "MaxRedirects": 8,
+  "NeedsProxies": true,
+  "OnlySocks": false,
+  "OnlySsl": false,
+  "MaxProxyUses": 0,
+  "BanProxyAfterGoodStatus": false,
+  "EncodeData": false,
+  "AllowedWordlist1": "",
+  "AllowedWordlist2": "",
+  "DataRules": [],
+  "CustomInputs": [
+    {
+      "Description": "Artist Hesap ID ?",
+      "VariableName": "id",
+      "Id": 1415545735
+    }
+  ],
+  "CaptchaUrl": "",
+  "Base64": "",
+  "Grayscale": false,
+  "RemoveLines": false,
+  "RemoveNoise": false,
+  "Dilate": false,
+  "Threshold": 1.0,
+  "DiffKeep": 0.0,
+  "DiffHide": 0.0,
+  "Saturate": false,
+  "Saturation": 0.0,
+  "Transparent": false,
+  "Contour": false,
+  "OnlyShow": false,
+  "ContrastGamma": false,
+  "Contrast": 1.0,
+  "Gamma": 1.0,
+  "Brightness": 1.0,
+  "RemoveLinesMin": 0,
+  "RemoveLinesMax": 0,
+  "Crop": false,
+  "ForceHeadless": false,
+  "AlwaysOpen": false,
+  "AlwaysQuit": false,
+  "DisableNotifications": false,
+  "CustomUserAgent": "",
+  "RandomUA": false,
+  "CustomCMDArgs": ""
+}
+
+[SCRIPT]
+#E-Posta_Gen FUNCTION RandomString "?l?l?l?l?l?l?l?l@script.com" -> VAR "mail" 
+
+#Şifre_Gen FUNCTION RandomString "?i?i?i?i?i?i?i?i" -> VAR "pass" 
+
+#Profil_Gen FUNCTION RandomString "scripthub-?d?d?d?d?d?d?d?d?d?d" -> VAR "prof" 
+
+#Register_Gen REQUEST POST "https://spclient.wg.spotify.com/signup/public/v2/account/create" 
+  CONTENT "{\"account_details\":{\"birthdate\":\"2000-01-01\",\"consent_flags\":{\"eula_agreed\":true,\"send_email\":false,\"third_party_email\":true},\"display_name\":\"<prof>\",\"email_and_password_identifier\":{\"email\":\"<mail>\",\"password\":\"<pass>\"},\"gender\":3},\"callback_uri\":\"https://www.spotify.com/signup/challenge?forward_url=https%3A%2F%2Fopen.spotify.com%2F&locale=tr\",\"client_info\":{\"api_key\":\"a1e486e2729f46d6bb368d6b2bcda326\",\"app_version\":\"v2\",\"capabilities\":[1],\"installation_id\":\"83a5b8c7e3a5c6023e021caa1d595906\",\"platform\":\"www\"},\"tracking\":{\"creation_flow\":\"\",\"creation_point\":\"https://www.spotify.com/tr/\",\"referrer\":\"\"}}" 
+  CONTENTTYPE "application/json" 
+  HEADER "Host: spclient.wg.spotify.com" 
+  HEADER "Connection: keep-alive" 
+  HEADER "User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36" 
+  HEADER "Content-Type: application/json" 
+  HEADER "Accept: */*" 
+  HEADER "Origin: https://www.spotify.com" 
+  HEADER "Sec-Fetch-Site: same-site" 
+  HEADER "Sec-Fetch-Mode: cors" 
+  HEADER "Sec-Fetch-Dest: empty" 
+  HEADER "Referer: https://www.spotify.com/" 
+  HEADER "Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "Accept-Encoding: gzip, deflate" 
+
+#Register_Key KEYCHECK 
+  KEYCHAIN Retry OR 
+    KEY "error" 
+  KEYCHAIN Success OR 
+    KEY "success" 
+
+#Nick PARSE "<SOURCE>" JSON "username" -> VAR "Nick" 
+
+#Token1 PARSE "<SOURCE>" JSON "login_token" -> VAR "Token1" 
+
+#RegisterTokenUrl REQUEST GET "https://www.spotify.com/tr/signup?forward_url=https%3A%2F%2Fopen.spotify.com%2F" 
+  
+  HEADER "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko" 
+  HEADER "Pragma: no-cache" 
+  HEADER "Accept: */*" 
+
+#Token2 PARSE "<SOURCE>" LR "csrfToken\":\"" "\",\"" -> VAR "csrfToken" 
+
+#RegisterAPiURL REQUEST POST "https://www.spotify.com/api/signup/authenticate" 
+  CONTENT "splot=<Token1>" 
+  CONTENTTYPE "application/x-www-form-urlencoded" 
+  HEADER "Host: www.spotify.com" 
+  HEADER "Connection: keep-alive" 
+  HEADER "User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36" 
+  HEADER "X-CSRF-Token: <csrfToken>" 
+  HEADER "Content-Type: application/x-www-form-urlencoded" 
+  HEADER "Accept: */*" 
+  HEADER "Origin: https://www.spotify.com" 
+  HEADER "Sec-Fetch-Site: same-origin" 
+  HEADER "Sec-Fetch-Mode: cors" 
+  HEADER "Sec-Fetch-Dest: empty" 
+  HEADER "Referer: https://www.spotify.com/tr/signup?forward_url=https%3A%2F%2Fopen.spotify.com%2F" 
+  HEADER "Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "Accept-Encoding: gzip, deflate" 
+
+#Token3URL REQUEST GET "https://open.spotify.com/" 
+  
+  HEADER "Host: open.spotify.com" 
+  HEADER "Connection: keep-alive" 
+  HEADER "Upgrade-Insecure-Requests: 1" 
+  HEADER "User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36" 
+  HEADER "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" 
+  HEADER "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"101\", \"Opera GX\";v=\"87\"" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "sec-ch-ua-platform: \"Windows\"" 
+  HEADER "Sec-Fetch-Site: same-site" 
+  HEADER "Sec-Fetch-Mode: navigate" 
+  HEADER "Sec-Fetch-User: ?1" 
+  HEADER "Sec-Fetch-Dest: document" 
+  HEADER "Referer: https://www.spotify.com/" 
+  HEADER "Accept-Language: tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7" 
+  HEADER "Accept-Encoding: gzip, deflate" 
+
+#Token3 PARSE "<SOURCE>" LR "accessToken\":\"" "\",\"" -> VAR "Token3" 
+
+#ArtistURL REQUEST PUT "https://api.spotify.com/v1/me/following?type=artist&ids=<id>" 
+  CONTENT "" 
+  CONTENTTYPE "application/x-www-form-urlencoded" 
+  HEADER "Host: api.spotify.com" 
+  HEADER "Connection: keep-alive" 
+  HEADER "sec-ch-ua: \".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"" 
+  HEADER "accept-language: tr" 
+  HEADER "sec-ch-ua-mobile: ?0" 
+  HEADER "authorization: Bearer <Token3>" 
+  HEADER "accept: application/json" 
+  HEADER "User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36" 
+  HEADER "spotify-app-version: 1.1.90.78.g7fc10288" 
+  HEADER "app-platform: WebPlayer" 
+  HEADER "sec-ch-ua-platform: \"Windows\"" 
+  HEADER "Origin: https://open.spotify.com" 
+  HEADER "Sec-Fetch-Site: same-site" 
+  HEADER "Sec-Fetch-Mode: cors" 
+  HEADER "Sec-Fetch-Dest: empty" 
+  HEADER "Referer: https://open.spotify.com/" 
+  HEADER "Accept-Encoding: gzip, deflate" 
+
+#ArtistKey KEYCHECK 
+  KEYCHAIN Retry OR 
+    KEY "<RESPONSECODE>" Contains "400" 
+    KEY "<RESPONSECODE>" Contains "404" 
+  KEYCHAIN Success OR 
+    KEY "<RESPONSECODE>" Contains "204" 
+
